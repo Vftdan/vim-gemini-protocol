@@ -1,6 +1,7 @@
 if !has('g:gemini_follow_redirects')
 	" Do not set to false with the current gmni version
 	" It doesn't output redirect header to stdout
+	" Only use with submodule version
 	let g:gemini_follow_redirects = v:true
 endif
 if !has('g:gemini_max_redirects')

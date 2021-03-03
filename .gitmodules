@@ -1,0 +1,3 @@
+[submodule "gmni"]
+	path = gmni
+	url = https://git.sr.ht/~vftdan/gmni
