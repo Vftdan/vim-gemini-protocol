@@ -44,8 +44,13 @@ function! s:read_gemini(url)
 		let l:header = 'No data'
 	endif
 	" Output doesn't seem to work from autocommands
-	redraw
-	echomsg l:header
+	function! s:error_message(...) closure
+		redraw
+		echohl WarningMsg
+		echomsg 'Gemini: ' . l:header
+		echohl None
+	endfunction
+	call timer_start(0, funcref('s:error_message'))
 	return
 endfunction
 
