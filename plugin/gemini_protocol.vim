@@ -39,6 +39,7 @@ function! s:construct_command(url)
 	return 'echo'
 endfunction
 
+let s:redirects = 0
 function! s:read_gemini(url)
 	let l:svpos = winsaveview()
 	setlocal bl ro noswapfile bh=hide fenc=
@@ -54,11 +55,25 @@ function! s:read_gemini(url)
 	keepjumps 1delete _
 	keepjumps call winrestview(l:svpos)
 	if l:header[0] == '3'
-		" This plugin doesn't know, how to join urls,
-		" '/...', '//...' are not handled properly by :find
-		call append(0, '=> ' . trim(l:header[3:]) . ' Redirect')
+		let l:new_url = trim(l:header[3:])
+		if has_key(g:, 'Gemini_redirect_function') && s:redirects < g:gemini_max_redirects
+			let s:redirects += 1
+			let l:new_url = g:Gemini_redirect_function(l:new_url)
+			if type(l:new_url) == 1
+				" String was returned
+				0file
+				exe 'file ' . fnameescape(l:new_url)
+				return s:read_gemini(l:new_url)
+			endif
+		else
+			" This plugin doesn't know, how to join urls,
+			" '/...', '//...' are not handled properly by :find
+			call append(0, '=> ' . l:new_url . ' Redirect')
+		endif
+		let s:redirects = 0
 		return
 	endif
+	let s:redirects = 0
 	if l:header[0] == '1'
 		let l:url = matchstr(a:url, '\v^[^\?\#]+') . '?' . s:uriencode(input(l:header[3:] . ': '))
 		0file
