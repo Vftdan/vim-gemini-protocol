@@ -10,6 +10,34 @@ endif
 if !has('g:gemini_gmni_command')
 	let g:gemini_gmni_command = shellescape(get(split(globpath(&rtp, 'gmni/gmni'), '\n'), 0, 'gmni'))
 endif
+if !has('g:gemini_connect_with')
+	let g:gemini_connect_with = 'gmni'
+endif
+
+let s:url_regexp = '\v^[^:]+:\/\/%([^\@]+\@)?([^:\/]+)%(:(\d+))?%(\/.*)?$'
+
+function! s:construct_command(url)
+	if g:gemini_connect_with ==? 'gmni'
+		return g:gemini_gmni_command . ' -j once -iN ' . (g:gemini_follow_redirects ? '-R ' . g:gemini_max_redirects . ' -L ' : '') . shellescape(a:url) . ' 2>/dev/null'
+	endif
+
+	let l:domain = substitute(a:url, s:url_regexp, '\1', '')
+	let l:port = substitute(a:url, s:url_regexp, '\2', '')
+	if l:port == ''
+		let l:port = '1965'
+	endif
+
+	if g:gemini_connect_with ==? 'openssl'
+		return 'echo ' . shellescape(a:url . "\r") . ' | openssl s_client -connect ' . shellescape(l:domain . ':' . l:port) . ' -quiet 2>/dev/null'
+	endif
+
+	if g:gemini_connect_with ==? 'ncat'
+		return 'echo ' . shellescape(a:url) . ' | ncat -C --ssl ' . shellescape(l:domain) . ' ' . shellescape(l:port)
+	endif
+
+	echoerr 'Gemini: invalid gemini_connect_with value: ' . shellescape(g:gemini_connect_with)
+	return 'echo'
+endfunction
 
 function! s:read_gemini(url)
 	let l:svpos = winsaveview()
@@ -19,7 +47,7 @@ function! s:read_gemini(url)
 	else
 		let &ft=&ft
 	endif
-	exe '%read ++bin !' . g:gemini_gmni_command . ' -j once -iN ' . (g:gemini_follow_redirects ? '-R ' . g:gemini_max_redirects . ' -L ' : '') . shellescape(a:url) . ' 2>/dev/null'
+	exe '%read ++bin !' . s:construct_command(a:url)
 	keepjumps normal! ggJ
 	let l:header = getline(1)
 	let b:gemini_header = l:header
