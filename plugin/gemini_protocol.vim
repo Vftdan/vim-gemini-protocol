@@ -56,7 +56,7 @@ function! s:read_gemini(url)
 	if l:header[0] == '3'
 		" This plugin doesn't know, how to join urls,
 		" '/...', '//...' are not handled properly by :find
-		call append(0, '=> ' . l:header[3:] . ' Redirect')
+		call append(0, '=> ' . trim(l:header[3:]) . ' Redirect')
 		return
 	endif
 	if l:header[0] == '1'
