@@ -1,16 +1,16 @@
-if !has('g:gemini_follow_redirects')
+if !has_key(g:, 'gemini_follow_redirects')
 	" Do not set to false with the current gmni version
 	" It doesn't output redirect header to stdout
 	" Only use with submodule version
 	let g:gemini_follow_redirects = v:true
 endif
-if !has('g:gemini_max_redirects')
+if !has_key(g:, 'gemini_max_redirects')
 	let g:gemini_max_redirects = 5
 endif
-if !has('g:gemini_gmni_command')
+if !has_key(g:, 'gemini_gmni_command')
 	let g:gemini_gmni_command = shellescape(get(split(globpath(&rtp, 'gmni/gmni'), '\n'), 0, 'gmni'))
 endif
-if !has('g:gemini_connect_with')
+if !has_key(g:, 'gemini_connect_with')
 	let g:gemini_connect_with = 'gmni'
 endif
 
