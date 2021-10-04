@@ -32,7 +32,7 @@ function! s:construct_command(url)
 	endif
 
 	if g:gemini_connect_with ==? 'ncat'
-		return 'echo ' . shellescape(a:url) . ' | ncat -C --ssl ' . shellescape(l:domain) . ' ' . shellescape(l:port)
+		return 'echo ' . shellescape(a:url) . ' | ncat -C --ssl --no-shutdown ' . shellescape(l:domain) . ' ' . shellescape(l:port)
 	endif
 
 	echoerr 'Gemini: invalid gemini_connect_with value: ' . shellescape(g:gemini_connect_with)
