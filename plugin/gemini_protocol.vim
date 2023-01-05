@@ -48,7 +48,7 @@ function! s:read_gemini(url)
 	else
 		let &ft=&ft
 	endif
-	exe '%read ++bin !' . escape(s:construct_command(a:url), '%#\')
+	exe '%read ++bin ++ff=dos !' . escape(s:construct_command(a:url), '%#\')
 	keepjumps normal! ggJ
 	let l:header = getline(1)
 	let b:gemini_header = l:header
